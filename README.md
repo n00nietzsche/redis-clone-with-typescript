@@ -1,4 +1,15 @@
-[![progress-banner](https://backend.codecrafters.io/progress/redis/50182b9d-2722-4aac-9f97-40721804447b)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+## 프로젝트 설명
+
+- Typescript 를 통해 Redis 서버를 구현합니다.
+- Javascript Runtime 은 Bun 을 이용합니다.
+- Vitest 를 이용해 테스트합니다.
+
+## Redis 참조 문서
+
+- [Redis 통신규약](https://redis.io/docs/latest/develop/reference/protocol-spec/)
+  - [쉬운 버전으로 쓰인 아티클](https://lethain.com/redis-protocol/)
+
+## Codecrafters Challange
 
 This is a starting point for TypeScript solutions to the
 ["Build Your Own Redis" Challenge](https://codecrafters.io/challenges/redis).
