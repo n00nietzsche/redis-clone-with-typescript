@@ -16,15 +16,15 @@ const server: net.Server = net.createServer(
         JSON.stringify(data.toString())
       );
 
-      const parsed = parse(data.toString());
+      const { command, args } = parse(
+        data.toString()
+      );
 
-      if (parsed.command === "ECHO") {
-        connection.write(
-          `+${parsed.args[0]}\r\n`
-        );
+      if (command === "ECHO") {
+        connection.write(`+${args[0]}\r\n`);
       }
 
-      if (parsed.command === "PING") {
+      if (command === "PING") {
         connection.write("+PONG\r\n");
       }
     });
