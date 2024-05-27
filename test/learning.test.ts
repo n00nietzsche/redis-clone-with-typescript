@@ -1,18 +1,21 @@
-import * as net from "net";
 import { describe, expect, it } from "vitest";
 
-describe("Redis server", () => {
-  it("should respond with +PONG\\r\\n when client sends PING\\r\\n", () => {
-    const client = net.createConnection(
-      { port: 6379, host: "127.0.0.1" },
-      () => {
-        client.write("PING\r\n");
-      }
-    );
+describe("Learning test", () => {
+  it("the length increases by 1 for each blank space", () => {
+    const zeroSpace =
+      "ECHOECHOECHOECHOEHCOEHCOEHOCHOE";
+    const split1 = zeroSpace.split(" ");
+    expect(split1.length).toBe(1);
 
-    client.on("data", (data: Buffer) => {
-      expect(data.toString()).toBe("+PONG\r\n");
-      client.end();
-    });
+    const oneSpace = "ECHO hey";
+    const split2 = oneSpace.split(" ");
+    expect(split2.length).toBe(2);
+  });
+
+  it("First one be command and second one be argument", () => {
+    const input = "ECHO hey";
+    const [command, arg] = input.split(" ");
+    expect(command).toBe("ECHO");
+    expect(arg).toBe("hey");
   });
 });

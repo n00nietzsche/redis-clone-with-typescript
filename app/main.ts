@@ -1,4 +1,5 @@
 import * as net from "net";
+import { parse } from "./parser";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log(
@@ -15,7 +16,17 @@ const server: net.Server = net.createServer(
         JSON.stringify(data.toString())
       );
 
-      connection.write("+PONG\r\n");
+      const parsed = parse(data.toString());
+
+      if (parsed.command === "ECHO") {
+        connection.write(
+          `+${parsed.args[0]}\r\n`
+        );
+      }
+
+      if (parsed.command === "PING") {
+        connection.write("+PONG\r\n");
+      }
     });
   }
 );
