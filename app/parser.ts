@@ -1,4 +1,4 @@
-// *3\r\n$4\r\nECHO\r\n$3\r\nhey\r\n$8\r\nasdfasdf\r\n
+import { RedisRESPDataType as type } from "./enum/resp-data-type";
 
 export function split(input: string): string[] {
   return input
@@ -10,6 +10,15 @@ export function parse(input: string): {
   command: string;
   args: string[];
 } {
+  switch (input[0]) {
+    case type.Array:
+      return parseArray(input);
+    default:
+      throw new Error("Invalid input");
+  }
+}
+
+function parseArray(input: string) {
   const splited = split(input);
   const length = +splited[0].replace("*", "");
 
