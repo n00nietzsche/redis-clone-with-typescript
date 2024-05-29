@@ -21,6 +21,11 @@ const server: net.Server = net.createServer(
       );
 
       if (command === "ECHO") {
+        if (args.length === 0) {
+          connection.write("+\r\n");
+          return;
+        }
+
         connection.write(`+${args[0]}\r\n`);
       }
 
