@@ -1,12 +1,17 @@
 import { describe } from "node:test";
 import { expect, it } from "vitest";
-import { parse, split } from "../app/parser";
+import {
+  parseArray,
+  parseBulkString,
+  splitByTerminator,
+} from "../app/parser";
+import { RedisRESPDataType } from "../app/enum/resp-data-type";
 
-describe("Split method", () => {
-  it("should split string by \\r\\n", () => {
+describe("split by terminal method", () => {
+  it("should split string by protocol terminator(\\r\\n)", () => {
     const input =
       "*3\r\n$4\r\nECHO\r\n$3\r\nhey\r\n$8\r\nasdfasdf\r\n";
-    const parsed = split(input);
+    const parsed = splitByTerminator(input);
 
     expect(parsed).toEqual([
       "*3",
@@ -20,18 +25,30 @@ describe("Split method", () => {
   });
 });
 
-describe("Parse method", () => {
-  it("should parse the input string to object", () => {
-    const input =
-      "*3\r\n$4\r\nECHO\r\n$3\r\nhey\r\n$8\r\nasdfasdf\r\n";
+describe("parse bulk string method", () => {
+  it("should parse bulk string input to IParseResult interface", () => {
+    const input = "$5\r\nhello\r\n";
 
-    const parsed = parse(input);
-
-    console.log("parsed", parsed);
+    const parsed = parseBulkString(input);
 
     expect(parsed).toEqual({
-      command: "ECHO",
-      args: ["hey", "asdfasdf"],
+      type: RedisRESPDataType.BulkString,
+      value: "hello",
     });
+  });
+});
+
+describe("parse array method", () => {
+  it("should parse array string input to array of IParseResult interface", () => {
+    const input = "*1\r\n$5\r\nhello\r\n";
+
+    const parsed = parseArray(input);
+
+    expect(parsed).toEqual([
+      {
+        type: RedisRESPDataType.BulkString,
+        value: "hello",
+      },
+    ]);
   });
 });

@@ -16,6 +16,7 @@ const server: net.Server = net.createServer(
         JSON.stringify(data.toString())
       );
 
+      // TODO: 바뀐 parse 함수를 사용하여 command 와 args 를 추출하고, 해당하는 명령어에 대한 응답을 보내야 함
       const { command, args } = parse(
         data.toString()
       );
