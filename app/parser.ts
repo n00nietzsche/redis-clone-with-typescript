@@ -15,8 +15,6 @@ export function splitByTerminator(
   return input.split(TERMINATOR).filter(Boolean);
 }
 
-// parse 에서 받든, parseArray 에서 받든 다 처리를 해줬으면 좋겠는데, 현재 상황에서는 parse 에선 Terminator 로 나눠져있지가 않고, parseArray 에서만 나눠져있음
-// -> parseArray 에서 parseBulkString 으로 넘겨줄 때 다시 합쳐서 넘겨줬음
 export function parseBulkString(
   input: string
 ): IParseResult {
@@ -42,6 +40,11 @@ export function parseBulkString(
   };
 }
 
+/**
+ * RESP Array 를 파싱하는 함수
+ * @param input 프로토콜에 맞는 RESP Array 문자열
+ * @returns {IParseResult[]} 타입과 값을 가진 오브젝트의 배열
+ */
 export function parseArray(input: string) {
   const splitInput = splitByTerminator(input);
   const length = +splitInput[0].replace(
@@ -59,10 +62,6 @@ export function parseArray(input: string) {
     // empty array
     return result;
   }
-
-  // TODO: RESP Array 로 온 Element 들을 다시 한번 나눠주기
-  // TODO: 다음 Element 의 Type 에 따라 어디까지가 해당 Element 인지 구분하기
-  // TODO: Type 마다 매개변수를 몇개씩 받을 수 있는지 고려해야 함
 
   let index = 1; // Array 에 대한 포인터 역할
   let completed = 0; // 완료된 Element 의 갯수
@@ -99,14 +98,23 @@ export function parseArray(input: string) {
   return result;
 }
 
-export function parse(input: string): {
+/**
+ * Redis Client 에게 받은 Command 를 파싱하는 함수
+ * Command 는 RESP Array 로 들어온다
+ * 첫번째 Element 는 Command 이고 나머지는 Argument 이다
+ * @param input 프로토콜에 맞는 RESP Array 문자열
+ * @returns {command: string, args: string[]} Command 와 Argument 를 가진 오브젝트
+ */
+export function parseClientCommand(
+  input: string
+): {
   command: string;
   args: string[];
 } {
-  switch (input[0]) {
-    case type.Array:
-      parseArray(input);
-    default:
-      throw new Error("Invalid input");
-  }
+  const [command, ...args] = parseArray(input);
+
+  return {
+    command: command.value,
+    args: args.map((e) => e.value),
+  };
 }

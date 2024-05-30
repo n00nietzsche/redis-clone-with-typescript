@@ -47,7 +47,7 @@ describe("ECHO command", () => {
         { port: 6379, host: "127.0.0.1" },
         () => {
           client.write(
-            `*2\r\n$4\r\nECHO\r\n$3\r\n${testString}\r\n`
+            `*2\r\n$4\r\nECHO\r\n$${testString.length}\r\n${testString}\r\n`
           );
         }
       );

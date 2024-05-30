@@ -51,4 +51,26 @@ describe("parse array method", () => {
       },
     ]);
   });
+
+  it("should parse array string input to array of IParseResult interface", () => {
+    const input =
+      "*3\r\n$4\r\nECHO\r\n$3\r\nhey\r\n$8\r\nasdfasdf\r\n";
+
+    const parsed = parseArray(input);
+
+    expect(parsed).toEqual([
+      {
+        type: RedisRESPDataType.BulkString,
+        value: "ECHO",
+      },
+      {
+        type: RedisRESPDataType.BulkString,
+        value: "hey",
+      },
+      {
+        type: RedisRESPDataType.BulkString,
+        value: "asdfasdf",
+      },
+    ]);
+  });
 });

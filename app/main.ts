@@ -1,5 +1,5 @@
 import * as net from "net";
-import { parse } from "./parser";
+import { parseClientCommand } from "./parser";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log(
@@ -17,9 +17,8 @@ const server: net.Server = net.createServer(
       );
 
       // TODO: 바뀐 parse 함수를 사용하여 command 와 args 를 추출하고, 해당하는 명령어에 대한 응답을 보내야 함
-      const { command, args } = parse(
-        data.toString()
-      );
+      const { command, args } =
+        parseClientCommand(data.toString());
 
       if (command === "ECHO") {
         if (args.length === 0) {
