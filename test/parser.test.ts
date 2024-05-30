@@ -3,6 +3,7 @@ import { expect, it } from "vitest";
 import {
   parseArray,
   parseBulkString,
+  parseClientCommand,
   splitByTerminator,
 } from "../app/parser";
 import { RedisRESPDataType } from "../app/enum/resp-data-type";
@@ -72,5 +73,50 @@ describe("parse array method", () => {
         value: "asdfasdf",
       },
     ]);
+  });
+});
+
+describe("parse client command method", () => {
+  it("should parse command with no arguments", () => {
+    const input = "*1\r\n$4\r\nPING\r\n";
+
+    const parsed = parseClientCommand(input);
+
+    expect(parsed).toEqual({
+      command: "PING",
+      args: [],
+    });
+  });
+
+  it("should parse command with one argument", () => {
+    const input =
+      "*2\r\n$4\r\nECHO\r\n$5\r\nhello\r\n";
+
+    const parsed = parseClientCommand(input);
+
+    expect(parsed).toEqual({
+      command: "ECHO",
+      args: ["hello"],
+    });
+  });
+
+  it("should parse command with multiple arguments", () => {
+    const input =
+      "*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n";
+
+    const parsed = parseClientCommand(input);
+
+    expect(parsed).toEqual({
+      command: "SET",
+      args: ["key", "value"],
+    });
+  });
+
+  it("should throw error when input is invalid", () => {
+    const input = "*-1\r\n";
+
+    expect(() =>
+      parseClientCommand(input)
+    ).toThrowError("Invalid input");
   });
 });
