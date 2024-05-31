@@ -15,6 +15,12 @@ export function splitByTerminator(
   return input.split(TERMINATOR).filter(Boolean);
 }
 
+export function toSimpleString(
+  arg: string
+): string {
+  return `+${arg}\r\n`;
+}
+
 export function parseBulkString(
   input: string
 ): IParseResult {
