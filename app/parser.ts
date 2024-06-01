@@ -21,6 +21,31 @@ export function toSimpleString(
   return `+${arg}\r\n`;
 }
 
+export function toSimpleError(
+  arg: string
+): string {
+  return `-${arg}\r\n`;
+}
+
+export function toBulkString(
+  arg: string | null
+): string {
+  if (arg === null) {
+    return getNullBulkString();
+  }
+
+  return `$${arg.length}\r\n${arg}\r\n`;
+}
+
+/**
+ * 프로토콜에서 존재하지 않는 값을 나타냄
+ * GET 명령어로 존재하지 않는 키를 조회하면 이 값을 반환한다
+ * @returns $-1\r\n
+ */
+function getNullBulkString(): string {
+  return "$-1\r\n";
+}
+
 export function parseBulkString(
   input: string
 ): IParseResult {
