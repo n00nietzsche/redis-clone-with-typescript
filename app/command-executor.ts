@@ -19,6 +19,8 @@ export class CommandExecutor {
     command: string,
     args: string[]
   ) {
+    command = command.toUpperCase();
+
     switch (command) {
       case "ECHO":
         this.echo(args);
