@@ -1,13 +1,10 @@
-import { Socket } from "net";
 import {
   beforeEach,
   describe,
   expect,
   it,
-  vi,
 } from "vitest";
 import { Store } from "../app/store";
-import { CommandExecutor } from "../app/command-executor";
 import {
   toBulkString,
   toSimpleString,
@@ -24,7 +21,7 @@ describe("CommandHandler 클래스의", () => {
   });
 
   describe("echo() 메서드는", () => {
-    it("인자로 문자열을 받으면 RESP 프로토콜의 SimpleString 형태로 문자를 반환한다.", () => {
+    it("인자로 'Hello, World!' 를 받으면 SimpleString 타입으로 'Hello, World!' 를 응답한다.", () => {
       const testString = "Hello, World!";
       const response = handler.echo([testString]);
 
