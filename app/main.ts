@@ -2,6 +2,7 @@ import * as net from "net";
 import { parseClientCommand } from "./parser";
 import { CommandExecutor } from "./command-executor";
 import { Store } from "./store";
+import { CommandHandler } from "./command-handler";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log(
@@ -11,9 +12,13 @@ console.log(
 export function getRedisServer(store: Store) {
   const server = net.createServer(
     (connection: net.Socket) => {
+      const commandHandler = new CommandHandler(
+        store
+      );
+
       const commandExecutor = new CommandExecutor(
         connection,
-        store
+        commandHandler
       );
 
       // Handle connection

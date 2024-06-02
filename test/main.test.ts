@@ -25,114 +25,96 @@ async function sendInput(
     }
   );
 
-  const [data] = await once(client, "data");
+  const [response] = await once(client, "data");
   client.end();
-  return data;
+  return response;
 }
 
-describe("PING command", () => {
-  let server;
+describe("Redis 서버 애플리케이션은", () => {
+  describe("PING 명령을 받으면", () => {
+    let server;
 
-  beforeEach(() => {
-    server = getRedisServer(new Store());
-    server.listen(6380, "127.0.0.1");
+    beforeEach(() => {
+      server = getRedisServer(new Store());
+      server.listen(6380, "127.0.0.1");
+    });
+
+    afterEach(() => {
+      server.close();
+    });
+
+    it("SimpleString 타입의 PONG 을 응답한다.", async () => {
+      const response = await sendInput(
+        "*1\r\n$4\r\nPING\r\n",
+        server
+      );
+
+      expect(response.toString()).toBe(
+        toSimpleString("PONG")
+      );
+    });
   });
 
-  afterEach(() => {
-    server.close();
-  });
+  describe("ECHO 명령어를 받았을 때", () => {
+    let server;
 
-  it("should respond with +PONG\\r\\n when client sends PING\\r\\n", async () => {
-    const data = await sendInput(
-      "*1\r\n$4\r\nPING\r\n",
-      server
-    );
+    beforeEach(() => {
+      server = getRedisServer(new Store());
+      server.listen(6380, "127.0.0.1");
+    });
 
-    expect(data.toString()).toBe(
-      toSimpleString("PONG")
-    );
-  });
-});
+    afterEach(() => {
+      server.close();
+    });
 
-describe("ECHO command", () => {
-  let server;
-
-  beforeEach(() => {
-    server = getRedisServer(new Store());
-    server.listen(6380, "127.0.0.1");
-  });
-
-  afterEach(() => {
-    server.close();
-  });
-
-  it("should respond with hey when client sends ECHO hey", async () => {
-    const data = await sendInput(
-      "*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n",
-      server
-    );
-
-    expect(data.toString()).toBe(
-      toSimpleString("hey")
-    );
-  });
-
-  const testCases = [
-    "aasdfasdtartawrt",
-    "a",
-    "1",
-    "#",
-    "$",
-  ];
-
-  testCases.forEach((testString) => {
-    it(`should respond with ${testString} when client sends ECHO ${testString}`, async () => {
+    it("hey 라는 문자열을 인자로 받으면, SimpleString 타입의 hey 를 응답한다.", async () => {
       const data = await sendInput(
-        `*2\r\n$4\r\nECHO\r\n$${testString.length}\r\n${testString}\r\n`,
+        "*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n",
         server
       );
 
       expect(data.toString()).toBe(
-        `+${testString}\r\n`
+        toSimpleString("hey")
       );
     });
-  });
-});
 
-describe("SET command", () => {
-  let server;
+    const testCases = [
+      "aasdfasdtartawrt",
+      "a",
+      "1",
+      "#",
+      "$",
+    ];
 
-  beforeEach(() => {
-    server = getRedisServer(new Store());
-    server.listen(6380, "127.0.0.1");
-  });
+    testCases.forEach((testString) => {
+      it(`${testString} 문자열을 인자로 받으면, SimpleString 타입의 ${testString} 를 응답한다.`, async () => {
+        const data = await sendInput(
+          `*2\r\n$4\r\nECHO\r\n$${testString.length}\r\n${testString}\r\n`,
+          server
+        );
 
-  afterEach(() => {
-    server.close();
-  });
-
-  it("should respond with +OK\\r\\n when client sends SET key value", async () => {
-    const data = await sendInput(
-      "*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n",
-      server
-    );
-
-    expect(data.toString()).toBe(
-      toSimpleString("OK")
-    );
+        expect(data.toString()).toBe(
+          `+${testString}\r\n`
+        );
+      });
+    });
   });
 
-  const testCases = [
-    ["a", "b"],
-    ["1", "2"],
-    ["#", "$"],
-    ["asdfasdf", "asdfasdf"],
-  ];
+  describe("SET 명령어를 받았을 때", () => {
+    let server;
 
-  testCases.forEach(([key, value]) => {
-    it(`should respond with +OK\\r\\n when client sends SET ${key} ${value}`, async () => {
+    beforeEach(() => {
+      server = getRedisServer(new Store());
+      server.listen(6380, "127.0.0.1");
+    });
+
+    afterEach(() => {
+      server.close();
+    });
+
+    it("유효한 key 와 value 를 받으면, SimpleString 타입의 OK 를 응답한다.", async () => {
       const data = await sendInput(
-        `*3\r\n$3\r\nSET\r\n$${key.length}\r\n${key}\r\n$${value.length}\r\n${value}\r\n`,
+        "*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n",
         server
       );
 
@@ -140,49 +122,69 @@ describe("SET command", () => {
         toSimpleString("OK")
       );
     });
-  });
-});
 
-describe("GET command", () => {
-  let server;
+    const testCases = [
+      ["a", "b"],
+      ["1", "2"],
+      ["#", "$"],
+      ["asdfasdf", "asdfasdf"],
+    ];
 
-  beforeEach(() => {
-    server = getRedisServer(new Store());
-    server.listen(6380, "127.0.0.1");
-  });
+    testCases.forEach(([key, value]) => {
+      it(`키로 ${key} 를 받고 값으로 ${value} 를 받으면, SimpleString 타입의 OK 를 응답한다.`, async () => {
+        const data = await sendInput(
+          `*3\r\n$3\r\nSET\r\n$${key.length}\r\n${key}\r\n$${value.length}\r\n${value}\r\n`,
+          server
+        );
 
-  afterEach(() => {
-    server.close();
-  });
-
-  it("should respond with $-1\\r\\n when client sends GET key that does not exist", async () => {
-    const data = await sendInput(
-      "*2\r\n$3\r\nGET\r\n$3\r\nkey\r\n",
-      server
-    );
-
-    expect(data.toString()).toBe(
-      toBulkString(null)
-    );
+        expect(data.toString()).toBe(
+          toSimpleString("OK")
+        );
+      });
+    });
   });
 
-  it("should respond with $5\\r\\nvalue\\r\\n when client sends GET key that exists", async () => {
-    const data = await sendInput(
-      "*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n",
-      server
-    );
+  describe("GET 명령어를 받았을 때", () => {
+    let server;
 
-    expect(data.toString()).toBe(
-      toSimpleString("OK")
-    );
+    beforeEach(() => {
+      server = getRedisServer(new Store());
+      server.listen(6380, "127.0.0.1");
+    });
 
-    const data2 = await sendInput(
-      "*2\r\n$3\r\nGET\r\n$3\r\nkey\r\n",
-      server
-    );
+    afterEach(() => {
+      server.close();
+    });
 
-    expect(data2.toString()).toBe(
-      toBulkString("value")
-    );
+    it("존재하지 않는 키를 인자로 받으면, null bulk stirng 을 응답한다.", async () => {
+      const data = await sendInput(
+        "*2\r\n$3\r\nGET\r\n$3\r\nkey\r\n",
+        server
+      );
+
+      expect(data.toString()).toBe(
+        toBulkString(null)
+      );
+    });
+
+    it("존재하는 키를 인자로 받으면, 해당 키에 대한 값을 BulkString 타입으로 응답한다.", async () => {
+      const data = await sendInput(
+        "*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n",
+        server
+      );
+
+      expect(data.toString()).toBe(
+        toSimpleString("OK")
+      );
+
+      const data2 = await sendInput(
+        "*2\r\n$3\r\nGET\r\n$3\r\nkey\r\n",
+        server
+      );
+
+      expect(data2.toString()).toBe(
+        toBulkString("value")
+      );
+    });
   });
 });
