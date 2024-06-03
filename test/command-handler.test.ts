@@ -47,6 +47,24 @@ describe("CommandHandler 클래스의", () => {
         testValue
       );
     });
+
+    it('인자로 키, 값, "PX", 만료 까지 남은 시간(밀리초)을 받으면, 값을 store 에 저장하고, "OK"를 반환한다.', () => {
+      const testKey = "key";
+      const testValue = "value";
+
+      const response = handler.set([
+        testKey,
+        testValue,
+        "PX",
+        "1000",
+      ]);
+
+      expect(response).toBe(toSimpleString("OK"));
+
+      expect(store.get(testKey)).toEqual(
+        testValue
+      );
+    });
   });
 
   describe("get() 메서드는", () => {
@@ -67,6 +85,40 @@ describe("CommandHandler 클래스의", () => {
       const response = handler.get([testKey]);
 
       expect(response).toBe(toBulkString(null));
+    });
+
+    it("만료된 키를 받으면, Null bulk string 을 반환한다.", () => {
+      const testKey = "key";
+      const testValue = "value";
+
+      handler.set([
+        testKey,
+        testValue,
+        "PX",
+        "-1000",
+      ]);
+
+      const response = handler.get([testKey]);
+
+      expect(response).toBe(toBulkString(null));
+    });
+
+    it("만료되지 않은 키를 받으면, 키에 저장된 값을 반환한다.", () => {
+      const testKey = "key";
+      const testValue = "value";
+
+      handler.set([
+        testKey,
+        testValue,
+        "PX",
+        "+1000",
+      ]);
+
+      const response = handler.get([testKey]);
+
+      expect(response).toBe(
+        toBulkString(testValue)
+      );
     });
   });
 

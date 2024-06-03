@@ -37,9 +37,24 @@ export class CommandHandler {
   }
 
   set(args: string[]) {
-    this.assertArgsLength("SET", args, 2);
+    this.assertArgsLengthMin("SET", args, 2);
+    const [key, value, ...options] = args;
 
-    this.store.set(args[0], args[1]);
+    if (options.includes("PX")) {
+      const ttl = parseInt(
+        options[options.indexOf("PX") + 1]
+      );
+
+      this.store.set(
+        key,
+        value,
+        new Date(Date.now() + ttl)
+      );
+
+      return toSimpleString("OK");
+    }
+
+    this.store.set(key, value);
     return toSimpleString("OK");
   }
 
@@ -48,7 +63,7 @@ export class CommandHandler {
 
     const value = this.store.get(args[0]);
 
-    if (value === undefined) {
+    if (!value) {
       return toBulkString(null);
     } else {
       return toBulkString(value);
@@ -78,6 +93,18 @@ export class CommandHandler {
     if (args.length < length) {
       throw new Error(
         `인자가 너무 적습니다. ${command} 명령어는 인자가 ${length}개 필요합니다.`
+      );
+    }
+  }
+
+  private assertArgsLengthMin(
+    command: string,
+    args: string[],
+    minLength: number
+  ) {
+    if (args.length < minLength) {
+      throw new Error(
+        `인자가 너무 적습니다. ${command} 명령어는 최소 ${minLength}개의 인자가 필요합니다.`
       );
     }
   }
