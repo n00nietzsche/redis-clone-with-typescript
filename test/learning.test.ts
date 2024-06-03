@@ -18,4 +18,14 @@ describe("Learning test", () => {
     expect(command).toBe("ECHO");
     expect(arg).toBe("hey");
   });
+
+  it("현재 시간을 밀리초로 구하는 방법", () => {
+    // Date.now() 는 현재 시간을 밀리초로 반환, 생성자의 정적 메서드
+    const now = Date.now();
+    expect(now).toBe(new Date().getTime());
+
+    // new Date().getTime() 도 현재 시간을 밀리초로 반환 2
+    const now2 = new Date().getTime();
+    expect(now2).toBe(Date.now());
+  });
 });
