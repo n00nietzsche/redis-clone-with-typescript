@@ -186,5 +186,45 @@ describe("Redis 서버 애플리케이션은", () => {
         toBulkString("value")
       );
     });
+
+    it("존재하는 키를 인자로 받으면, 만료되지 않았을 때 값을 BulkString 타입으로 응답한다.", async () => {
+      const data = await sendInput(
+        "*5\r\n$3\r\nSET\r\n$6\r\nbanana\r\n$9\r\npineapple\r\n$2\r\npx\r\n$3\r\n100\r\n",
+        server
+      );
+
+      expect(data.toString()).toBe(
+        toSimpleString("OK")
+      );
+
+      const data2 = await sendInput(
+        "*2\r\n$3\r\nGET\r\n$6\r\nbanana\r\n",
+        server
+      );
+
+      expect(data2.toString()).toBe(
+        toBulkString("pineapple")
+      );
+    });
+
+    it("존재하는 키를 인자로 받으면, 만료되었을 때 값을 NullBulkString 타입으로 응답한다.", async () => {
+      const data = await sendInput(
+        "*5\r\n$3\r\nSET\r\n$6\r\nbanana\r\n$9\r\npineapple\r\n$2\r\npx\r\n:-100\r\n",
+        server
+      );
+
+      expect(data.toString()).toBe(
+        toSimpleString("OK")
+      );
+
+      const data2 = await sendInput(
+        "*2\r\n$3\r\nGET\r\n$6\r\nbanana\r\n",
+        server
+      );
+
+      expect(data2.toString()).toBe(
+        toBulkString(null)
+      );
+    });
   });
 });
