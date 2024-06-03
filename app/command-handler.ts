@@ -14,6 +14,8 @@ export class CommandHandler {
 
   handleCommand(command: string, args: string[]) {
     command = command.toUpperCase();
+    args = args.map((arg) => arg.toUpperCase());
+
     let response: string;
 
     switch (command) {
