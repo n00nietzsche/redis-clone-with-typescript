@@ -14,7 +14,18 @@ export class CommandHandler {
 
   handleCommand(command: string, args: string[]) {
     command = command.toUpperCase();
-    args = args.map((arg) => arg.toUpperCase());
+
+    // SET 명령어의 경우, 옵션에 대한 대소문자 구분 무시를 위해 옵션은 미리 대문자로 변환하여 통일시켜줌
+    if (command === "SET") {
+      args = args.map((arg, index) => {
+        // 첫번째, 두번째는 키, 값이므로 대문자로 변환하지 않음
+        if (index <= 1) {
+          return arg;
+        }
+
+        return arg.toUpperCase();
+      });
+    }
 
     let response: string;
 
