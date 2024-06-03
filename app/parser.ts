@@ -71,6 +71,15 @@ export function parseBulkString(
   };
 }
 
+export function parseInteger(
+  input: string
+): IParseResult {
+  return {
+    type: type.Integer,
+    value: input.replace(type.Integer, ""),
+  };
+}
+
 /**
  * RESP Array 를 파싱하는 함수
  * @param input 프로토콜에 맞는 RESP Array 문자열
@@ -113,6 +122,12 @@ export function parseArray(input: string) {
         );
 
         index++;
+        break;
+      case type.Integer:
+        parseResult = parseInteger(
+          splitInput[index]
+        );
+
         break;
       default:
         throw new Error("Invalid input");
