@@ -33,14 +33,14 @@ export class CommandHandler {
       case "ECHO":
         response = this.echo(args);
         break;
+      case "GET":
+        response = this.get(args);
+        break;
       case "PING":
         response = this.ping();
         break;
       case "SET":
         response = this.set(args);
-        break;
-      case "GET":
-        response = this.get(args);
         break;
       default:
         throw new Error("Invalid command");
