@@ -1,8 +1,10 @@
 import * as net from "net";
+import { argv } from "process";
 import { parseClientCommand } from "./parser";
 import { CommandExecutor } from "./command-executor";
 import { Store } from "./store";
 import { CommandHandler } from "./command-handler";
+import { getPort } from "./utils";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log(
@@ -47,4 +49,6 @@ const server: net.Server = getRedisServer(
   new Store()
 );
 
-server.listen(6379, "127.0.0.1");
+const port = getPort(argv);
+
+server.listen(port, "127.0.0.1");
