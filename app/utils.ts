@@ -34,3 +34,10 @@ export function getPort(args: string[]) {
 
   return 6379;
 }
+
+export function caseInsensitiveEqual(
+  a: string,
+  b: string
+) {
+  return a.toUpperCase() === b.toUpperCase();
+}
