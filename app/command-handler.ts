@@ -4,6 +4,7 @@ import {
   toSimpleString,
 } from "./parser";
 import { Store } from "./store";
+import { caseInsensitiveEqual } from "./utils";
 
 export class CommandHandler {
   store: Store;
@@ -36,6 +37,9 @@ export class CommandHandler {
       case "GET":
         response = this.get(args);
         break;
+      case "INFO":
+        response = this.info(args);
+        break;
       case "PING":
         response = this.ping();
         break;
@@ -47,6 +51,19 @@ export class CommandHandler {
     }
 
     return response;
+  }
+
+  info(args: string[]) {
+    this.assertArgsLength("INFO", args, 1);
+
+    if (
+      args[0] &&
+      caseInsensitiveEqual(args[0], "REPLICATION")
+    ) {
+      return toBulkString("role:master");
+    }
+
+    return toBulkString(null);
   }
 
   set(args: string[]) {
