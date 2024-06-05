@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { RedisServerInfo } from "../app/server-info";
 
 describe("Learning test", () => {
   it("the length increases by 1 for each blank space", () => {
@@ -27,5 +28,17 @@ describe("Learning test", () => {
     // new Date().getTime() 도 현재 시간을 밀리초로 반환 2
     const now2 = new Date().getTime();
     expect(now2).toBe(Date.now());
+  });
+
+  it("클래스의 필드를 순회", () => {
+    const serverInfo = new RedisServerInfo();
+
+    for (const key in serverInfo) {
+      console.log(key);
+      console.log(serverInfo[key]);
+      console.log(
+        serverInfo.getReplicationInfo()
+      );
+    }
   });
 });
