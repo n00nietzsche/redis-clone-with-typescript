@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getOptionArr } from "../app/utils";
+import {
+  getOptionArr,
+  getPort,
+} from "../app/utils";
 
 describe("utils 내부의", () => {
   describe("getOptionArr() 함수는", () => {
@@ -49,6 +52,30 @@ describe("utils 내부의", () => {
         2
       );
       expect(result).toBeNull();
+    });
+  });
+
+  describe("getPort() 함수는", () => {
+    it("배열에 '--port' 옵션과 유효한 포트 번호가 주어지면, 그 포트 번호를 정수로 반환한다.", () => {
+      const args = [
+        "/Users/jakeseo/.bun/bin/bun",
+        "/Users/jakeseo/Desktop/study/codecrafters-redis-typescript/app/main.ts",
+        "--port",
+        "8080",
+      ];
+
+      const result = getPort(args);
+      expect(result).toEqual(8080);
+    });
+
+    it("배열에 '--port' 옵션이 없으면, 기본 포트 번호인 6379를 반환한다.", () => {
+      const args = [
+        "/Users/jakeseo/.bun/bin/bun",
+        "/Users/jakeseo/Desktop/study/codecrafters-redis-typescript/app/main.ts",
+      ];
+
+      const result = getPort(args);
+      expect(result).toEqual(6379);
     });
   });
 });

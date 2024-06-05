@@ -24,3 +24,13 @@ export function getOptionArr(
     index + optionArgLength + 1
   );
 }
+
+export function getPort(args: string[]) {
+  const result = getOptionArr(args, "--port", 1);
+
+  if (result) {
+    return parseInt(result[1]);
+  }
+
+  return 6379;
+}
