@@ -35,6 +35,25 @@ export function getPort(args: string[]) {
   return 6379;
 }
 
+export function getReplicaOf(args: string[]) {
+  const result = getOptionArr(
+    args,
+    "--replicaof",
+    1
+  );
+
+  if (result) {
+    const [host, port] = result[1].split(" ");
+
+    return {
+      host,
+      port,
+    };
+  }
+
+  return null;
+}
+
 export function caseInsensitiveEqual(
   a: string,
   b: string

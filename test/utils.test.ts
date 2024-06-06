@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getOptionArr,
   getPort,
+  getReplicaOf,
 } from "../app/utils";
 
 describe("utils 내부의", () => {
@@ -76,6 +77,33 @@ describe("utils 내부의", () => {
 
       const result = getPort(args);
       expect(result).toEqual(6379);
+    });
+  });
+
+  describe("getReplicaOf() 함수는", () => {
+    it("배열에 '--replicaof' 옵션과 유효한 호스트와 포트가 주어지면, 그 호스트와 포트를 객체로 반환한다.", () => {
+      const args = [
+        "/Users/jakeseo/.bun/bin/bun",
+        "/Users/jakeseo/Desktop/study/codecrafters-redis-typescript/app/main.ts",
+        "--replicaof",
+        "localhost 8080",
+      ];
+
+      const result = getReplicaOf(args);
+      expect(result).toEqual({
+        host: "localhost",
+        port: "8080",
+      });
+    });
+
+    it("배열에 '--replicaof' 옵션이 없으면, null을 반환한다.", () => {
+      const args = [
+        "/Users/jakeseo/.bun/bin/bun",
+        "/Users/jakeseo/Desktop/study/codecrafters-redis-typescript/app/main.ts",
+      ];
+
+      const result = getReplicaOf(args);
+      expect(result).toBeNull();
     });
   });
 });
