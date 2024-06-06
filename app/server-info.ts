@@ -1,7 +1,25 @@
+interface IServerConstructorParams {
+  port: number;
+}
+class Server {
+  port: number;
+
+  constructor({
+    port,
+  }: IServerConstructorParams) {
+    this.port = port;
+  }
+}
+
+interface IReplicationConstructorParams {
+  role: string;
+}
 class Replication {
   role: string;
 
-  constructor({ role }: { role: string }) {
+  constructor({
+    role,
+  }: IReplicationConstructorParams) {
     this.role = role;
   }
 
@@ -20,13 +38,22 @@ class Replication {
   }
 }
 
+interface IRedisServerInfoConstructorParams {
+  replicationParams: IReplicationConstructorParams;
+  serverParams: IServerConstructorParams;
+}
 export class RedisServerInfo {
   replication: Replication;
+  server: Server;
 
-  constructor() {
-    this.replication = new Replication({
-      role: "master",
-    });
+  constructor({
+    replicationParams,
+    serverParams,
+  }: IRedisServerInfoConstructorParams) {
+    this.replication = new Replication(
+      replicationParams
+    );
+    this.server = new Server(serverParams);
   }
 
   getReplicationInfo() {

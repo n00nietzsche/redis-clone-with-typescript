@@ -3,14 +3,20 @@ import {
   toSimpleError,
   toSimpleString,
 } from "./parser";
+import { RedisServerInfo } from "./server-info";
 import { Store } from "./store";
 import { caseInsensitiveEqual } from "./utils";
 
 export class CommandHandler {
   store: Store;
+  serverInfo: RedisServerInfo;
 
-  constructor(store: Store) {
+  constructor(
+    store: Store,
+    serverInfo: RedisServerInfo
+  ) {
     this.store = store;
+    this.serverInfo = serverInfo;
   }
 
   handleCommand(command: string, args: string[]) {
@@ -60,7 +66,9 @@ export class CommandHandler {
       args[0] &&
       caseInsensitiveEqual(args[0], "REPLICATION")
     ) {
-      return toBulkString("role:master");
+      return toBulkString(
+        this.serverInfo.getReplicationInfo()
+      );
     }
 
     return toBulkString(null);

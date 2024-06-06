@@ -4,18 +4,23 @@ import { parseClientCommand } from "./parser";
 import { CommandExecutor } from "./command-executor";
 import { Store } from "./store";
 import { CommandHandler } from "./command-handler";
-import { getPort } from "./utils";
+import { getPort, getReplicaOf } from "./utils";
+import { RedisServerInfo } from "./server-info";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log(
   "Logs from your program will appear here!"
 );
 
-export function getRedisServer(store: Store) {
+export function getRedisServer(
+  store: Store,
+  serverInfo: RedisServerInfo
+) {
   const server = net.createServer(
     (connection: net.Socket) => {
       const commandHandler = new CommandHandler(
-        store
+        store,
+        serverInfo
       );
 
       const commandExecutor = new CommandExecutor(
@@ -44,11 +49,22 @@ export function getRedisServer(store: Store) {
   return server;
 }
 
+const port = getPort(argv);
+const replica = getReplicaOf(argv);
+
+const redisServerInfo = new RedisServerInfo({
+  replicationParams: {
+    role: replica ? "slave" : "master",
+  },
+  serverParams: {
+    port,
+  },
+});
+
 // Uncomment this block to pass the first stage
 const server: net.Server = getRedisServer(
-  new Store()
+  new Store(),
+  redisServerInfo
 );
-
-const port = getPort(argv);
 
 server.listen(port, "127.0.0.1");

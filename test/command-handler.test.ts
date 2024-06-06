@@ -10,14 +10,28 @@ import {
   toSimpleString,
 } from "../app/parser";
 import { CommandHandler } from "../app/command-handler";
+import { RedisServerInfo } from "../app/server-info";
 
 describe("CommandHandler 클래스의", () => {
   let store: Store;
   let handler: CommandHandler;
+  let serverInfo: RedisServerInfo;
 
   beforeEach(() => {
     store = new Store();
-    handler = new CommandHandler(store);
+    serverInfo = new RedisServerInfo({
+      replicationParams: {
+        role: "master",
+      },
+      serverParams: {
+        port: 6380,
+      },
+    });
+
+    handler = new CommandHandler(
+      store,
+      serverInfo
+    );
   });
 
   describe("echo() 메서드는", () => {
@@ -129,6 +143,26 @@ describe("CommandHandler 클래스의", () => {
       expect(response).toBe(
         toSimpleString("PONG")
       );
+    });
+  });
+
+  describe("info() 메서드는", () => {
+    it("인자로 'REPLICATION'을 받으면, 서버의 복제 정보를 반환한다.", () => {
+      const response = handler.info([
+        "REPLICATION",
+      ]);
+
+      expect(response).toBe(
+        toBulkString(
+          serverInfo.getReplicationInfo()
+        )
+      );
+    });
+
+    it("인자로 'REPLICATION'을 받지 않으면, Null bulk string 을 반환한다.", () => {
+      const response = handler.info([""]);
+
+      expect(response).toBe(toBulkString(null));
     });
   });
 });

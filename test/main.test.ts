@@ -13,6 +13,7 @@ import {
 } from "../app/parser";
 import { getRedisServer } from "../app/main";
 import { Store } from "../app/store";
+import { RedisServerInfo } from "../app/server-info";
 
 async function sendInput(input: string) {
   const client = net.createConnection(
@@ -28,11 +29,25 @@ async function sendInput(input: string) {
 }
 
 describe("Redis 서버 애플리케이션은", () => {
+  const port = 6380;
+  const host = "127.0.0.1";
+
   let server;
+  let serverInfo = new RedisServerInfo({
+    replicationParams: {
+      role: "master",
+    },
+    serverParams: {
+      port,
+    },
+  });
 
   beforeEach(() => {
-    server = getRedisServer(new Store());
-    server.listen(6380, "127.0.0.1");
+    server = getRedisServer(
+      new Store(),
+      serverInfo
+    );
+    server.listen(port, host);
   });
 
   afterEach(() => {
@@ -176,6 +191,20 @@ describe("Redis 서버 애플리케이션은", () => {
 
       expect(data2.toString()).toBe(
         toBulkString(null)
+      );
+    });
+  });
+
+  describe("INFO 명령어를 받았을 때", () => {
+    it("REPLICATION 인자를 받으면, replication 정보를 BulkString 타입으로 응답한다.", async () => {
+      const data = await sendInput(
+        "*2\r\n$4\r\nINFO\r\n$11\r\nREPLICATION\r\n"
+      );
+
+      expect(data.toString()).toBe(
+        toBulkString(
+          serverInfo.getReplicationInfo()
+        )
       );
     });
   });
