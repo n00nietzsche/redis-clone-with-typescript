@@ -13,14 +13,22 @@ class Server {
 
 interface IReplicationConstructorParams {
   role: string;
+  master_replid: string;
+  master_repl_offset: number;
 }
 class Replication {
   role: string;
+  master_replid: string;
+  master_repl_offset: number;
 
   constructor({
     role,
+    master_replid,
+    master_repl_offset,
   }: IReplicationConstructorParams) {
     this.role = role;
+    this.master_replid = master_replid;
+    this.master_repl_offset = master_repl_offset;
   }
 
   toInfoStrArr() {
